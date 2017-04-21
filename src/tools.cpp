@@ -30,7 +30,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
         error = error.array() * error.array();
         
         rmse += error;
-    }
+    };
     
     rmse = rmse / (estimations.size());
     

@@ -37,6 +37,7 @@ private:
 
   // previous timestamp
   long previous_timestamp_;
+  Eigen::MatrixXd I;
 
   // tool object used to compute Jacobian and RMSE
   Tools tools;
