@@ -81,14 +81,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     
     VectorXd y;
     y = z - zp;
-    std::cout<<"****\n"<<y[1]<<"Z1 \n";
+    
     if (y[1] < -M_PI/2) {
         y[1] = y[1] + 2*M_PI;
     }
     if (y[1] > M_PI/2) {
         y[1] = y[1] - 2*M_PI;
     }
-    std::cout<<y[1]<<"Z2 \n";
     
     MatrixXd S;
     S = Hj*P_*Hj.transpose() + R_;
