@@ -39,9 +39,11 @@ void KalmanFilter::Update(const VectorXd &z) {
     VectorXd y;
     y = z - H_*x_;
     MatrixXd S;
-    S = H_*P_*H_.transpose() + R_;
+    MatrixXd Ph;
+    Ph = P_ * H_.transpose();
+    S = H_*Ph + R_;
     MatrixXd K;
-    K = P_*H_.transpose()*S.inverse();
+    K = Ph*S.inverse();
     
     MatrixXd I(4,4);
     I << 1,0,0,0,
@@ -73,7 +75,14 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     double vx = x_[2];
     double vy = x_[3];
     
+    
     double z1 = sqrt((px*px) + (py*py));
+
+    if (py ==0 && px == 0){
+        px = 0.001;
+        py = 0.001;
+    }
+    
     double z2 = atan2(py, px);
     double z3 = (px*vx + py*vy)/z1;
     
@@ -90,10 +99,12 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
     }
     
     MatrixXd S;
-    S = Hj*P_*Hj.transpose() + R_;
+    MatrixXd Pj;
+    Pj = P_*Hj.transpose();
+    S = Hj*Pj + R_;
     
     MatrixXd K;
-    K = P_*Hj.transpose()*S.inverse();
+    K = Pj*S.inverse();
     
     x_ = x_ + (K * y);
     //x_ = Hj.inverse() * x_;

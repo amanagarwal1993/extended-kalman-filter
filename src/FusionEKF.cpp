@@ -93,7 +93,16 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Initialize with first measurement.
       */
-        ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
+        VectorXd x(4);
+        
+        x << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
+        if (x[0] < 0.0001) {
+            x[0] = 0.0001;
+        }
+        if (x[1] < 0.0001) {
+            x[1] = 0.0001;
+        }
+        ekf_.x_ << x[0], x[1], 0, 0;
         //cout<<ekf_.x_<<" After adding laser values to it \n"<<endl;
     }
       // Setting the first timestamp
@@ -117,11 +126,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
         long newtime = measurement_pack.timestamp_; // New timestamp
 
         dtime = (newtime - previous_timestamp_) / 1000000.0;
+        
+        // If time gap is too small, skip predict step
+        if (dtime > 0) {
+        
         double dtime2 = dtime * dtime;
         double dtime3 = dtime2 * dtime / 2;
         double dtime4 = dtime2 * dtime2 / 4;
 
-     
         int noise_ax, noise_ay;
         noise_ax = 9.;
         noise_ay = 9.;
@@ -138,9 +150,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
         ekf_.F_(1,3) = dtime;
 
 
-      ekf_.Predict();
-      //cout<<ekf_.x_<<" Predicted x\n"; **********************************************************
-
+        ekf_.Predict();
+        //cout<<ekf_.x_<<" Predicted x\n"; **********************************************************
+        };
+        
         Hj_ = MatrixXd(3, 4);
 
 
